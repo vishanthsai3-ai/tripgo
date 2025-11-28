@@ -1,0 +1,2440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripiGo - Explore. Dream. Go.</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== CSS VARIABLES & GLOBAL STYLES ===== */
+        :root {
+            --primary: #0057FF;
+            --primary-light: #4F8BFF;
+            --primary-lighter: #A9CFFF;
+            --secondary: #6C63FF;
+            --accent: #FF6B6B;
+            --dark: #1A1A2E;
+            --dark-light: #2D3047;
+            --gray: #8A8D9F;
+            --gray-light: #F5F7FA;
+            --white: #FFFFFF;
+            --success: #00C851;
+            --warning: #FFBB33;
+            --error: #FF4444;
+            
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+            --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-2xl: 32px;
+            
+            --font-primary: 'Inter', sans-serif;
+            --font-secondary: 'Poppins', sans-serif;
+            
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --transition-fast: all 0.15s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--white);
+            color: var(--dark);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--white);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s;
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+
+        .screen.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 24px;
+            border-radius: var(--radius-xl);
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            outline: none;
+            text-decoration: none;
+            font-family: var(--font-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--dark);
+            border: 1px solid var(--gray-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--gray-light);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-light);
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--gray-light);
+            background-color: var(--white);
+            font-size: 16px;
+            font-family: var(--font-primary);
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(79, 139, 255, 0.2);
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background-color: var(--gray-light);
+        }
+
+        .divider-text {
+            padding: 0 15px;
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        /* Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: var(--radius-lg);
+            transition: var(--transition);
+            color: var(--gray);
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .nav-text {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            background-color: var(--white);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .header-action {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--gray-light);
+            color: var(--dark);
+            transition: var(--transition);
+        }
+
+        .header-action:hover {
+            background-color: var(--primary-lighter);
+            color: var(--primary);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes scaleUp {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .fade-in { animation: fadeIn 0.8s ease forwards; }
+        .slide-up { animation: slideUp 0.6s ease forwards; }
+        .scale-up { animation: scaleUp 0.8s ease forwards; }
+        .bounce { animation: bounce 2s infinite; }
+
+        /* Loading Bar */
+        .loading-bar {
+            height: 4px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loading-progress {
+            height: 100%;
+            width: 0%;
+            background-color: var(--white);
+            border-radius: 2px;
+            animation: loading 3s linear forwards;
+        }
+
+        @keyframes loading {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* Splash Screen */
+        #splash-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            text-align: center;
+            padding: 40px;
+        }
+
+        .splash-logo {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: scaleUp 0.8s ease forwards, bounce 2s infinite 1s;
+        }
+
+        .splash-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-family: var(--font-secondary);
+        }
+
+        .splash-tagline {
+            font-size: 16px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .splash-loading {
+            width: 80%;
+            max-width: 300px;
+        }
+
+        /* Login Screen */
+        #login-screen {
+            padding: 40px 24px;
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease forwards;
+        }
+
+        .login-logo-icon {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .login-logo-text {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+            font-family: var(--font-secondary);
+        }
+
+        .login-form {
+            margin-bottom: 30px;
+        }
+
+        .social-login {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--gray);
+        }
+
+        .signup-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Signup Screen */
+        #signup-screen {
+            padding: 40px 24px;
+        }
+
+        .signup-header {
+            margin-bottom: 30px;
+        }
+
+        .signup-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .signup-subtitle {
+            color: var(--gray);
+        }
+
+        .otp-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 60px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-light);
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+            background-color: var(--white);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .otp-input:focus {
+            border-color: var(--primary-light);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(79, 139, 255, 0.2);
+        }
+
+        .success-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 24px;
+            height: 100%;
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            animation: scaleUp 0.8s ease forwards;
+        }
+
+        .success-icon i {
+            font-size: 48px;
+            color: var(--white);
+        }
+
+        .success-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .success-text {
+            color: var(--gray);
+            margin-bottom: 40px;
+        }
+
+        /* Home Screen */
+        #home-screen {
+            padding-bottom: 80px;
+        }
+
+        .search-bar {
+            padding: 20px 24px;
+            background-color: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            padding-left: 50px;
+            padding-right: 50px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .search-mic {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+        }
+
+        .section {
+            padding: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .section-link {
+            font-size: 14px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            background-color: var(--white);
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .category-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-lg);
+            background-color: var(--primary-lighter);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            color: var(--primary);
+            font-size: 20px;
+        }
+
+        .category-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .carousel {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .carousel-container {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 16px;
+            padding: 0 4px 16px;
+            scrollbar-width: none;
+        }
+
+        .carousel-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .carousel-card {
+            min-width: 280px;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            scroll-snap-align: start;
+            position: relative;
+        }
+
+        .carousel-image {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+
+        .carousel-content {
+            padding: 16px;
+            background-color: var(--white);
+        }
+
+        .carousel-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .carousel-details {
+            display: flex;
+            justify-content: space-between;
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .carousel-price {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .carousel-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 4px 12px;
+            border-radius: var(--radius-lg);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .destinations-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .destination-card {
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            position: relative;
+        }
+
+        .destination-image {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .destination-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 12px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+            color: var(--white);
+        }
+
+        .destination-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .destination-details {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .destination-rating {
+            display: flex;
+            align-items: center;
+            margin-right: 8px;
+        }
+
+        .destination-rating i {
+            color: var(--warning);
+            margin-right: 2px;
+            font-size: 10px;
+        }
+
+        /* Category Screens */
+        .category-screen {
+            padding-bottom: 80px;
+        }
+
+        .category-hero {
+            height: 200px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            text-align: center;
+            padding: 0 24px;
+        }
+
+        .category-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6));
+            z-index: 1;
+        }
+
+        .category-hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .category-hero-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .category-hero-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .category-list {
+            padding: 24px;
+        }
+
+        .category-item {
+            display: flex;
+            margin-bottom: 24px;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+        }
+
+        .category-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .category-item-image {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .category-item-content {
+            flex: 1;
+            padding: 16px;
+            background-color: var(--white);
+        }
+
+        .category-item-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .category-item-location {
+            display: flex;
+            align-items: center;
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .category-item-location i {
+            margin-right: 6px;
+        }
+
+        .category-item-rating {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .category-item-stars {
+            display: flex;
+            margin-right: 8px;
+        }
+
+        .category-item-stars i {
+            color: var(--warning);
+            font-size: 12px;
+        }
+
+        .category-item-reviews {
+            color: var(--gray);
+            font-size: 12px;
+        }
+
+        .category-item-price {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        /* Booking Screen */
+        #booking-screen {
+            padding-bottom: 100px;
+        }
+
+        .booking-carousel {
+            height: 300px;
+            position: relative;
+        }
+
+        .booking-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .booking-back {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark);
+            text-decoration: none;
+            box-shadow: var(--shadow-md);
+        }
+
+        .booking-content {
+            padding: 24px;
+        }
+
+        .booking-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .booking-location {
+            display: flex;
+            align-items: center;
+            color: var(--gray);
+            margin-bottom: 16px;
+        }
+
+        .booking-location i {
+            margin-right: 8px;
+        }
+
+        .booking-rating {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .booking-stars {
+            display: flex;
+            margin-right: 8px;
+        }
+
+        .booking-stars i {
+            color: var(--warning);
+            font-size: 14px;
+        }
+
+        .booking-reviews {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .booking-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--gray-light);
+            margin-bottom: 24px;
+        }
+
+        .booking-tab {
+            padding: 12px 16px;
+            font-weight: 600;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 2px solid transparent;
+        }
+
+        .booking-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .booking-details {
+            margin-bottom: 24px;
+        }
+
+        .booking-detail-item {
+            display: flex;
+            margin-bottom: 16px;
+        }
+
+        .booking-detail-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-lg);
+            background-color: var(--primary-lighter);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            color: var(--primary);
+        }
+
+        .booking-detail-content h4 {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .booking-detail-content p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .booking-form {
+            background-color: var(--gray-light);
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .booking-summary {
+            background-color: var(--white);
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 24px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--gray-light);
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .booking-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--white);
+            padding: 16px 24px;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .booking-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Payment Screen */
+        #payment-screen {
+            padding: 24px 24px 100px;
+        }
+
+        .payment-methods {
+            margin-bottom: 30px;
+        }
+
+        .payment-method {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-radius: var(--radius-xl);
+            background-color: var(--white);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .payment-method:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .payment-method.active {
+            border: 2px solid var(--primary);
+        }
+
+        .payment-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-lg);
+            background-color: var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            font-size: 24px;
+            color: var(--dark);
+        }
+
+        .payment-details {
+            flex: 1;
+        }
+
+        .payment-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .payment-description {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .payment-radio {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .payment-radio::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .payment-method.active .payment-radio::after {
+            opacity: 1;
+        }
+
+        .payment-form {
+            background-color: var(--white);
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 30px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .confirmation {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 24px;
+        }
+
+        .confirmation-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            animation: scaleUp 0.8s ease forwards;
+        }
+
+        .confirmation-icon i {
+            font-size: 48px;
+            color: var(--white);
+        }
+
+        .confirmation-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .confirmation-text {
+            color: var(--gray);
+            margin-bottom: 40px;
+        }
+
+        /* Profile Screen */
+        #profile-screen {
+            padding-bottom: 80px;
+        }
+
+        .profile-header {
+            padding: 40px 24px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 40px;
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .profile-email {
+            opacity: 0.8;
+        }
+
+        .profile-menu {
+            padding: 0 24px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--gray-light);
+            text-decoration: none;
+            color: var(--dark);
+            transition: var(--transition);
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item:hover {
+            color: var(--primary);
+        }
+
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-lg);
+            background-color: var(--primary-lighter);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            color: var(--primary);
+        }
+
+        .menu-content {
+            flex: 1;
+        }
+
+        .menu-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .menu-description {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .menu-arrow {
+            color: var(--gray);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 480px) {
+            .app-container {
+                max-width: 100%;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .destinations-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .category-item {
+                flex-direction: column;
+            }
+            
+            .category-item-image {
+                width: 100%;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Splash Screen -->
+        <div id="splash-screen" class="screen active">
+            <div class="splash-logo">
+                <i class="fas fa-plane"></i>
+            </div>
+            <h1 class="splash-title">TripiGo</h1>
+            <p class="splash-tagline">Explore. Dream. Go.</p>
+            <div class="splash-loading">
+                <div class="loading-bar">
+                    <div class="loading-progress"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Screen -->
+        <div id="login-screen" class="screen">
+            <div class="login-logo">
+                <div class="login-logo-icon">
+                    <i class="fas fa-plane"></i>
+                </div>
+                <div class="login-logo-text">TripiGo</div>
+            </div>
+            
+            <div class="login-form">
+                <div class="form-group">
+                    <input type="email" class="form-input" placeholder="Email address" id="login-email">
+                </div>
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <input type="password" class="form-input" placeholder="Password" id="login-password">
+                        <span class="input-icon">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
+                <div style="text-align: right; margin-bottom: 20px;">
+                    <a href="#" style="color: var(--primary); text-decoration: none; font-size: 14px;">Forgot password?</a>
+                </div>
+                <button class="btn btn-primary btn-full" id="login-btn">Login</button>
+            </div>
+            
+            <div class="divider">
+                <div class="divider-line"></div>
+                <div class="divider-text">OR</div>
+                <div class="divider-line"></div>
+            </div>
+            
+            <div class="social-login">
+                <button class="btn btn-secondary btn-full">
+                    <i class="fab fa-google" style="margin-right: 12px;"></i>
+                    Continue with Google
+                </button>
+                <button class="btn btn-secondary btn-full">
+                    <i class="fab fa-apple" style="margin-right: 12px;"></i>
+                    Continue with Apple
+                </button>
+            </div>
+            
+            <div class="signup-link">
+                Don't have an account? <a href="#" id="signup-link">Sign Up</a>
+            </div>
+        </div>
+
+        <!-- Signup Screen -->
+        <div id="signup-screen" class="screen">
+            <div class="signup-header">
+                <h2 class="signup-title">Create Account</h2>
+                <p class="signup-subtitle">Join TripiGo to explore the world</p>
+            </div>
+            
+            <div class="signup-form">
+                <div class="form-group">
+                    <input type="text" class="form-input" placeholder="Full Name" id="signup-name">
+                </div>
+                <div class="form-group">
+                    <input type="email" class="form-input" placeholder="Email address" id="signup-email">
+                </div>
+                <div class="form-group">
+                    <input type="tel" class="form-input" placeholder="Phone Number" id="signup-phone">
+                </div>
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <input type="password" class="form-input" placeholder="Password" id="signup-password">
+                        <span class="input-icon">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <input type="password" class="form-input" placeholder="Confirm Password" id="signup-confirm-password">
+                        <span class="input-icon">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-full" id="signup-continue">Continue</button>
+            </div>
+            
+            <!-- OTP Verification -->
+            <div id="otp-verification" style="display: none;">
+                <h3 style="margin-bottom: 16px; text-align: center;">Verify Your Account</h3>
+                <p style="text-align: center; color: var(--gray); margin-bottom: 24px;">We've sent a code to your email</p>
+                
+                <div class="otp-container">
+                    <input type="text" class="otp-input" maxlength="1" data-index="0">
+                    <input type="text" class="otp-input" maxlength="1" data-index="1">
+                    <input type="text" class="otp-input" maxlength="1" data-index="2">
+                    <input type="text" class="otp-input" maxlength="1" data-index="3">
+                    <input type="text" class="otp-input" maxlength="1" data-index="4">
+                    <input type="text" class="otp-input" maxlength="1" data-index="5">
+                </div>
+                
+                <p style="text-align: center; color: var(--gray); margin-bottom: 24px;">
+                    Didn't receive the code? <a href="#" style="color: var(--primary);" id="resend-otp">Resend</a>
+                </p>
+                
+                <button class="btn btn-primary btn-full" id="verify-otp">Verify</button>
+            </div>
+            
+            <!-- Success Screen -->
+            <div id="signup-success" class="success-screen" style="display: none;">
+                <div class="success-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h2 class="success-title">Account Created Successfully!</h2>
+                <p class="success-text">Your TripiGo account has been created. Start exploring the world.</p>
+                <button class="btn btn-primary" id="success-continue">Continue to Home</button>
+            </div>
+        </div>
+
+        <!-- Home Screen -->
+        <div id="home-screen" class="screen">
+            <div class="header">
+                <div class="header-title">TripiGo</div>
+                <div class="header-actions">
+                    <div class="header-action">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="header-action">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="search-bar">
+                <div class="search-container">
+                    <input type="text" class="form-input search-input" placeholder="Where do you want to go?">
+                    <div class="search-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="search-mic">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Explore the World</h2>
+                </div>
+                
+                <div class="category-grid">
+                    <div class="category-card" data-category="beaches">
+                        <div class="category-icon">
+                            <i class="fas fa-umbrella-beach"></i>
+                        </div>
+                        <div class="category-name">Beaches</div>
+                    </div>
+                    <div class="category-card" data-category="mountains">
+                        <div class="category-icon">
+                            <i class="fas fa-mountain"></i>
+                        </div>
+                        <div class="category-name">Mountains</div>
+                    </div>
+                    <div class="category-card" data-category="cities">
+                        <div class="category-icon">
+                            <i class="fas fa-city"></i>
+                        </div>
+                        <div class="category-name">Cities</div>
+                    </div>
+                    <div class="category-card" data-category="forests">
+                        <div class="category-icon">
+                            <i class="fas fa-tree"></i>
+                        </div>
+                        <div class="category-name">Forests</div>
+                    </div>
+                    <div class="category-card" data-category="deserts">
+                        <div class="category-icon">
+                            <i class="fas fa-sun"></i>
+                        </div>
+                        <div class="category-name">Deserts</div>
+                    </div>
+                    <div class="category-card" data-category="lakes">
+                        <div class="category-icon">
+                            <i class="fas fa-water"></i>
+                        </div>
+                        <div class="category-name">Lakes</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Trending Trips</h2>
+                    <a href="#" class="section-link">See All</a>
+                </div>
+                
+                <div class="carousel">
+                    <div class="carousel-container">
+                        <div class="carousel-card">
+                            <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Bali Trip" class="carousel-image">
+                            <div class="carousel-content">
+                                <div class="carousel-title">Bali Paradise</div>
+                                <div class="carousel-details">
+                                    <span>5 Days</span>
+                                    <span class="carousel-price">$899</span>
+                                </div>
+                            </div>
+                            <div class="carousel-badge">Popular</div>
+                        </div>
+                        
+                        <div class="carousel-card">
+                            <img src="https://images.unsplash.com/photo-1539667547526-4f7151d6b5b9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Paris Trip" class="carousel-image">
+                            <div class="carousel-content">
+                                <div class="carousel-title">Paris Romance</div>
+                                <div class="carousel-details">
+                                    <span>7 Days</span>
+                                    <span class="carousel-price">$1,299</span>
+                                </div>
+                            </div>
+                            <div class="carousel-badge" style="background-color: var(--warning);">Hot Deal</div>
+                        </div>
+                        
+                        <div class="carousel-card">
+                            <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Tokyo Trip" class="carousel-image">
+                            <div class="carousel-content">
+                                <div class="carousel-title">Tokyo Adventure</div>
+                                <div class="carousel-details">
+                                    <span>6 Days</span>
+                                    <span class="carousel-price">$1,199</span>
+                                </div>
+                            </div>
+                            <div class="carousel-badge" style="background-color: var(--success);">Recommended</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Popular Destinations</h2>
+                    <a href="#" class="section-link">See All</a>
+                </div>
+                
+                <div class="destinations-grid">
+                    <div class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1502602898536-47ad22581b52?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Paris" class="destination-image">
+                        <div class="destination-content">
+                            <div class="destination-name">Paris</div>
+                            <div class="destination-details">
+                                <div class="destination-rating">
+                                    <i class="fas fa-star"></i>
+                                    <span>4.8</span>
+                                </div>
+                                <span>France</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="New York" class="destination-image">
+                        <div class="destination-content">
+                            <div class="destination-name">New York</div>
+                            <div class="destination-details">
+                                <div class="destination-rating">
+                                    <i class="fas fa-star"></i>
+                                    <span>4.7</span>
+                                </div>
+                                <span>USA</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1540959733332-8a43b3a16d51?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Tokyo" class="destination-image">
+                        <div class="destination-content">
+                            <div class="destination-name">Tokyo</div>
+                            <div class="destination-details">
+                                <div class="destination-rating">
+                                    <i class="fas fa-star"></i>
+                                    <span>4.9</span>
+                                </div>
+                                <span>Japan</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="destination-card">
+                        <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Dubai" class="destination-image">
+                        <div class="destination-content">
+                            <div class="destination-name">Dubai</div>
+                            <div class="destination-details">
+                                <div class="destination-rating">
+                                    <i class="fas fa-star"></i>
+                                    <span>4.6</span>
+                                </div>
+                                <span>UAE</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <a href="#" class="nav-item active" data-screen="home-screen">
+                    <div class="nav-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="nav-text">Home</div>
+                </a>
+                <a href="#" class="nav-item" data-screen="explore-screen">
+                    <div class="nav-icon">
+                        <i class="fas fa-compass"></i>
+                    </div>
+                    <div class="nav-text">Explore</div>
+                </a>
+                <a href="#" class="nav-item" data-screen="trips-screen">
+                    <div class="nav-icon">
+                        <i class="fas fa-suitcase"></i>
+                    </div>
+                    <div class="nav-text">Trips</div>
+                </a>
+                <a href="#" class="nav-item" data-screen="wishlist-screen">
+                    <div class="nav-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="nav-text">Wishlist</div>
+                </a>
+                <a href="#" class="nav-item" data-screen="profile-screen">
+                    <div class="nav-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="nav-text">Profile</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Category Screens -->
+        <div id="beaches-screen" class="screen category-screen">
+            <div class="category-hero" style="background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80');">
+                <div class="category-hero-content">
+                    <h1 class="category-hero-title">Beaches</h1>
+                    <p class="category-hero-subtitle">Discover the world's most beautiful shores</p>
+                </div>
+            </div>
+            
+            <div class="category-list">
+                <div class="category-item">
+                    <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Maldives" class="category-item-image">
+                    <div class="category-item-content">
+                        <h3 class="category-item-title">Maldives Paradise</h3>
+                        <div class="category-item-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Maldives</span>
+                        </div>
+                        <div class="category-item-rating">
+                            <div class="category-item-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <div class="category-item-reviews">4.7 (1,243 reviews)</div>
+                        </div>
+                        <div class="category-item-price">$1,299</div>
+                    </div>
+                </div>
+                
+                <div class="category-item">
+                    <img src="https://images.unsplash.com/photo-1559494007-9f5847c49d94?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Bali" class="category-item-image">
+                    <div class="category-item-content">
+                        <h3 class="category-item-title">Bali Beach Retreat</h3>
+                        <div class="category-item-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Bali, Indonesia</span>
+                        </div>
+                        <div class="category-item-rating">
+                            <div class="category-item-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="category-item-reviews">5.0 (892 reviews)</div>
+                        </div>
+                        <div class="category-item-price">$899</div>
+                    </div>
+                </div>
+                
+                <div class="category-item">
+                    <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Phuket" class="category-item-image">
+                    <div class="category-item-content">
+                        <h3 class="category-item-title">Phuket Tropical Escape</h3>
+                        <div class="category-item-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Phuket, Thailand</span>
+                        </div>
+                        <div class="category-item-rating">
+                            <div class="category-item-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <div class="category-item-reviews">4.8 (1,567 reviews)</div>
+                        </div>
+                        <div class="category-item-price">$749</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <a href="#" class="nav-item" data-screen="home-screen">
+                    <div class="nav-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="nav-text">Home</div>
+                </a>
+                <a href="#" class="nav-item active" data-screen="beaches-screen">
+                    <div class="nav-icon">
+                        <i class="fas fa-umbrella-beach"></i>
+                    </div>
+                    <div class="nav-text">Beaches</div>
+                </a>
+                <a href="#" class="nav-item" data-screen="trips-screen">
+                    <div class="nav-icon">
+                        <i class="fas fa-suitcase"></i>
+                    </div>
+                    <div class="nav-text">Trips</div>
+                </a>
+                <a href="#" class="nav-item" data-screen="wishlist-screen">
+                    <div class="nav-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="nav-text">Wishlist</div>
+                </a>
+                <a href="#" class="nav-item" data-screen="profile-screen">
+                    <div class="nav-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="nav-text">Profile</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- More category screens would be added here (mountains, cities, forests, deserts, lakes) -->
+        <!-- Due to space constraints, I'm showing one category screen as an example -->
+
+        <!-- Booking Screen -->
+        <div id="booking-screen" class="screen">
+            <div class="booking-carousel">
+                <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Bali" class="booking-image">
+                <a href="#" class="booking-back" id="booking-back">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+            </div>
+            
+            <div class="booking-content">
+                <h1 class="booking-title">Bali Paradise Tour</h1>
+                <div class="booking-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Bali, Indonesia</span>
+                </div>
+                
+                <div class="booking-rating">
+                    <div class="booking-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <div class="booking-reviews">4.8 (2,347 reviews)</div>
+                </div>
+                
+                <div class="booking-tabs">
+                    <div class="booking-tab active">Overview</div>
+                    <div class="booking-tab">Itinerary</div>
+                    <div class="booking-tab">Reviews</div>
+                    <div class="booking-tab">Gallery</div>
+                </div>
+                
+                <div class="booking-details">
+                    <p>Experience the ultimate tropical getaway with our 5-day Bali Paradise Tour. Enjoy pristine beaches, vibrant culture, and luxurious accommodations in one of the world's most beautiful destinations.</p>
+                    
+                    <div class="booking-detail-item">
+                        <div class="booking-detail-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="booking-detail-content">
+                            <h4>Duration</h4>
+                            <p>5 days, 4 nights</p>
+                        </div>
+                    </div>
+                    
+                    <div class="booking-detail-item">
+                        <div class="booking-detail-icon">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <div class="booking-detail-content">
+                            <h4>Group Size</h4>
+                            <p>Small group, max 12 people</p>
+                        </div>
+                    </div>
+                    
+                    <div class="booking-detail-item">
+                        <div class="booking-detail-icon">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <div class="booking-detail-content">
+                            <h4>Meals</h4>
+                            <p>Breakfast included daily</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="booking-form">
+                    <h3 style="margin-bottom: 16px;">Select Dates & Travelers</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Travel Dates</label>
+                        <input type="text" class="form-input" placeholder="Select dates" id="date-picker">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Travelers</label>
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <span>Adults: </span>
+                                <span id="adult-count">2</span>
+                            </div>
+                            <div style="display: flex; gap: 12px;">
+                                <button class="btn" style="padding: 8px 12px; background-color: var(--gray-light);" id="decrease-adults">-</button>
+                                <button class="btn" style="padding: 8px 12px; background-color: var(--gray-light);" id="increase-adults">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="booking-summary">
+                    <h3 style="margin-bottom: 16px;">Price Summary</h3>
+                    
+                    <div class="summary-item">
+                        <span>Base price (2 adults)</span>
+                        <span>$799</span>
+                    </div>
+                    
+                    <div class="summary-item">
+                        <span>Taxes & fees</span>
+                        <span>$100</span>
+                    </div>
+                    
+                    <div class="summary-item">
+                        <span>Service charge</span>
+                        <span>$50</span>
+                    </div>
+                    
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span>$949</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="booking-footer">
+                <div class="booking-price">$949</div>
+                <button class="btn btn-primary" id="book-now-btn">Book Now</button>
+            </div>
+        </div>
+
+        <!-- Payment Screen -->
+        <div id="payment-screen" class="screen">
+            <div class="header">
+                <a href="#" class="header-action" id="payment-back">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div class="header-title">Payment</div>
+                <div class="header-actions"></div>
+            </div>
+            
+            <div class="payment-methods">
+                <div class="payment-method active" data-method="card">
+                    <div class="payment-icon">
+                        <i class="far fa-credit-card"></i>
+                    </div>
+                    <div class="payment-details">
+                        <div class="payment-title">Credit/Debit Card</div>
+                        <div class="payment-description">Pay with Visa, Mastercard, or Amex</div>
+                    </div>
+                    <div class="payment-radio"></div>
+                </div>
+                
+                <div class="payment-method" data-method="upi">
+                    <div class="payment-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="payment-details">
+                        <div class="payment-title">UPI</div>
+                        <div class="payment-description">Pay using UPI ID</div>
+                    </div>
+                    <div class="payment-radio"></div>
+                </div>
+                
+                <div class="payment-method" data-method="wallet">
+                    <div class="payment-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="payment-details">
+                        <div class="payment-title">Wallet</div>
+                        <div class="payment-description">Paytm, PhonePe, and more</div>
+                    </div>
+                    <div class="payment-radio"></div>
+                </div>
+            </div>
+            
+            <div class="payment-form" id="card-form">
+                <h3 style="margin-bottom: 16px;">Card Details</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Card Number</label>
+                    <input type="text" class="form-input" placeholder="1234 5678 9012 3456">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Expiry Date</label>
+                        <input type="text" class="form-input" placeholder="MM/YY">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">CVV</label>
+                        <input type="text" class="form-input" placeholder="123">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Cardholder Name</label>
+                    <input type="text" class="form-input" placeholder="John Doe">
+                </div>
+            </div>
+            
+            <div class="payment-form" id="upi-form" style="display: none;">
+                <h3 style="margin-bottom: 16px;">UPI Payment</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">UPI ID</label>
+                    <input type="text" class="form-input" placeholder="yourname@upi">
+                </div>
+                
+                <p style="text-align: center; color: var(--gray); margin: 20px 0;">
+                    You will be redirected to your UPI app to complete the payment
+                </p>
+            </div>
+            
+            <div class="payment-form" id="wallet-form" style="display: none;">
+                <h3 style="margin-bottom: 16px;">Select Wallet</h3>
+                
+                <div class="payment-method" style="margin-bottom: 16px;">
+                    <div class="payment-icon">
+                        <i class="fab fa-google-pay"></i>
+                    </div>
+                    <div class="payment-details">
+                        <div class="payment-title">Google Pay</div>
+                    </div>
+                    <div class="payment-radio"></div>
+                </div>
+                
+                <div class="payment-method" style="margin-bottom: 16px;">
+                    <div class="payment-icon">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                    <div class="payment-details">
+                        <div class="payment-title">Paytm</div>
+                    </div>
+                    <div class="payment-radio"></div>
+                </div>
+                
+                <div class="payment-method">
+                    <div class="payment-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="payment-details">
+                        <div class="payment-title">PhonePe</div>
+                    </div>
+                    <div class="payment-radio"></div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary btn-full" id="pay-now-btn">Pay Now $949</button>
+            
+            <!-- Confirmation Screen -->
+            <div id="confirmation-screen" class="confirmation" style="display: none;">
+                <div class="confirmation-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h2 class="confirmation-title">Booking Confirmed!</h2>
+                <p class="confirmation-text">Your Bali Paradise Tour has been successfully booked. Check your email for details.</p>
+                <button class="btn btn-primary" id="confirmation-continue">Back to Home</button>
+            </div>
+        </div>
+
+        <!-- Profile Screen -->
+        <div id="profile-screen" class="screen">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h2 class="profile-name">Alex Johnson</h2>
+                <p class="profile-email">alex.johnson@example.com</p>
+            </div>
+            
+            <div class="profile-menu">
+                <a href="#" class="menu-item">
+                    <div class="menu-icon">
+                        <i class="fas fa-suitcase"></i>
+                    </div>
+                    <div class="menu-content">
+                        <div class="menu-title">My Trips</div>
+                        <div class="menu-description">View your upcoming and past trips</div>
+                    </div>
+                    <div class="menu-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+                
+                <a href="#" class="menu-item">
+                    <div class="menu-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="menu-content">
+                        <div class="menu-title">Wishlist</div>
+                        <div class="menu-description">Your saved destinations and trips</div>
+                    </div>
+                    <div class="menu-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+                
+                <a href="#" class="menu-item">
+                    <div class="menu-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div class="menu-content">
+                        <div class="menu-title">Payments</div>
+                        <div class="menu-description">Payment methods and history</div>
+                    </div>
+                    <div class="menu-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+                
+                <a href="#" class="menu-item">
+                    <div class="menu-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div class="menu-content">
+                        <div class="menu-title">Support</div>
+                        <div class="menu-description">Get help with your trips</div>
+                    </div>
+                    <div class="menu-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+                
+                <a href="#" class="menu-item">
+                    <div class="menu-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="menu-content">
+                        <div class="menu-title">Settings</div>
+                        <div class="menu-description">App preferences and notifications</div>
+                    </div>
+                    <div class="menu-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+                
+                <a href="#" class="menu-item" id="logout-btn">
+                    <div class="menu-icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                    <div class="menu-content">
+                        <div class="menu-title">Logout</div>
+                        <div class="menu-description">Sign out of your account</div>
+                    </div>
+                    <div class="menu-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <a href="#" class="nav-item" data-screen="home-screen">
+                    <div class="nav-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="nav-text">Home</div>
+                </a>
+                <a href="#" class="nav-item" data-screen="explore-screen">
+                    <div class="nav-icon">
+                        <i class="fas fa-compass"></i>
+                    </div>
+                    <div class="nav-text">Explore</div>
+                </a>
+                <a href="#" class="nav-item" data-screen="trips-screen">
+                    <div class="nav-icon">
+                        <i class="fas fa-suitcase"></i>
+                    </div>
+                    <div class="nav-text">Trips</div>
+                </a>
+                <a href="#" class="nav-item" data-screen="wishlist-screen">
+                    <div class="nav-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="nav-text">Wishlist</div>
+                </a>
+                <a href="#" class="nav-item active" data-screen="profile-screen">
+                    <div class="nav-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="nav-text">Profile</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Main Application JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // Screen Navigation
+            const screens = document.querySelectorAll('.screen');
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            function showScreen(screenId) {
+                screens.forEach(screen => {
+                    screen.classList.remove('active');
+                });
+                
+                const targetScreen = document.getElementById(screenId);
+                if (targetScreen) {
+                    targetScreen.classList.add('active');
+                }
+            }
+            
+            // Navigation event listeners
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const screenId = this.getAttribute('data-screen');
+                    
+                    // Update active nav item
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    showScreen(screenId);
+                });
+            });
+            
+            // Category navigation
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+                    showScreen(`${category}-screen`);
+                    
+                    // Update active nav item
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    document.querySelector(`[data-screen="${category}-screen"]`).classList.add('active');
+                });
+            });
+            
+            // Splash screen auto navigation
+            setTimeout(function() {
+                showScreen('login-screen');
+            }, 3000);
+            
+            // Login screen navigation
+            document.getElementById('login-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                createRippleEffect(e);
+                
+                // Simple validation
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                
+                if (!email || !password) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+                
+                setTimeout(function() {
+                    showScreen('home-screen');
+                    
+                    // Update nav to home
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    document.querySelector('[data-screen="home-screen"]').classList.add('active');
+                }, 600);
+            });
+            
+            // Signup link
+            document.getElementById('signup-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                showScreen('signup-screen');
+            });
+            
+            // Signup process
+            document.getElementById('signup-continue').addEventListener('click', function(e) {
+                e.preventDefault();
+                createRippleEffect(e);
+                
+                // Simple validation
+                const name = document.getElementById('signup-name').value;
+                const email = document.getElementById('signup-email').value;
+                const phone = document.getElementById('signup-phone').value;
+                const password = document.getElementById('signup-password').value;
+                const confirmPassword = document.getElementById('signup-confirm-password').value;
+                
+                if (!name || !email || !phone || !password || !confirmPassword) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match');
+                    return;
+                }
+                
+                // Show OTP verification
+                document.querySelector('.signup-form').style.display = 'none';
+                document.getElementById('otp-verification').style.display = 'block';
+                
+                // Send OTP (simulated)
+                setTimeout(() => {
+                    alert('OTP sent to your email: 123456');
+                }, 1000);
+            });
+            
+            // OTP verification
+            document.getElementById('verify-otp').addEventListener('click', function(e) {
+                e.preventDefault();
+                createRippleEffect(e);
+                
+                // Check OTP (dummy check - always succeeds with any input)
+                const otpInputs = document.querySelectorAll('.otp-input');
+                let otp = '';
+                otpInputs.forEach(input => {
+                    otp += input.value;
+                });
+                
+                if (otp.length !== 6) {
+                    alert('Please enter the complete OTP');
+                    return;
+                }
+                
+                document.getElementById('otp-verification').style.display = 'none';
+                document.getElementById('signup-success').style.display = 'flex';
+            });
+            
+            // Resend OTP
+            document.getElementById('resend-otp').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Resend OTP (simulated)
+                setTimeout(() => {
+                    alert('New OTP sent to your email: 123456');
+                }, 1000);
+            });
+            
+            // Success continue
+            document.getElementById('success-continue').addEventListener('click', function(e) {
+                e.preventDefault();
+                createRippleEffect(e);
+                showScreen('home-screen');
+                
+                // Update nav to home
+                navItems.forEach(nav => nav.classList.remove('active'));
+                document.querySelector('[data-screen="home-screen"]').classList.add('active');
+            });
+            
+            // OTP input auto-focus
+            const otpInputs = document.querySelectorAll('.otp-input');
+            otpInputs.forEach((input, index) => {
+                input.addEventListener('input', function() {
+                    if (this.value.length === 1 && index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                    
+                    // Auto verify if all inputs are filled
+                    let allFilled = true;
+                    otpInputs.forEach(input => {
+                        if (!input.value) allFilled = false;
+                    });
+                    
+                    if (allFilled) {
+                        document.getElementById('verify-otp').click();
+                    }
+                });
+                
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+                });
+            });
+            
+            // Booking navigation
+            document.querySelectorAll('.carousel-card, .destination-card, .category-item').forEach(card => {
+                card.addEventListener('click', function() {
+                    showScreen('booking-screen');
+                });
+            });
+            
+            // Booking back button
+            document.getElementById('booking-back').addEventListener('click', function(e) {
+                e.preventDefault();
+                showScreen('home-screen');
+            });
+            
+            // Book now button
+            document.getElementById('book-now-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                createRippleEffect(e);
+                showScreen('payment-screen');
+            });
+            
+            // Payment back button
+            document.getElementById('payment-back').addEventListener('click', function(e) {
+                e.preventDefault();
+                showScreen('booking-screen');
+            });
+            
+            // Payment method selection
+            document.querySelectorAll('.payment-method').forEach(method => {
+                method.addEventListener('click', function() {
+                    // Remove active class from all methods
+                    document.querySelectorAll('.payment-method').forEach(m => {
+                        m.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked method
+                    this.classList.add('active');
+                    
+                    // Show corresponding form
+                    const methodType = this.getAttribute('data-method');
+                    document.getElementById('card-form').style.display = 'none';
+                    document.getElementById('upi-form').style.display = 'none';
+                    document.getElementById('wallet-form').style.display = 'none';
+                    
+                    document.getElementById(`${methodType}-form`).style.display = 'block';
+                });
+            });
+            
+            // Pay now button
+            document.getElementById('pay-now-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                createRippleEffect(e);
+                
+                // Hide payment form and show confirmation
+                document.querySelector('.payment-methods').style.display = 'none';
+                document.querySelector('.payment-form').style.display = 'none';
+                this.style.display = 'none';
+                document.getElementById('confirmation-screen').style.display = 'flex';
+            });
+            
+            // Confirmation continue
+            document.getElementById('confirmation-continue').addEventListener('click', function(e) {
+                e.preventDefault();
+                createRippleEffect(e);
+                showScreen('home-screen');
+                
+                // Update nav to home
+                navItems.forEach(nav => nav.classList.remove('active'));
+                document.querySelector('[data-screen="home-screen"]').classList.add('active');
+            });
+            
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                showScreen('login-screen');
+                
+                // Update nav to login (no active nav item)
+                navItems.forEach(nav => nav.classList.remove('active'));
+            });
+            
+            // Traveler count controls
+            let adultCount = 2;
+            document.getElementById('increase-adults').addEventListener('click', function() {
+                adultCount++;
+                document.getElementById('adult-count').textContent = adultCount;
+                
+                // Update price
+                updateBookingPrice();
+            });
+            
+            document.getElementById('decrease-adults').addEventListener('click', function() {
+                if (adultCount > 1) {
+                    adultCount--;
+                    document.getElementById('adult-count').textContent = adultCount;
+                    
+                    // Update price
+                    updateBookingPrice();
+                }
+            });
+            
+            function updateBookingPrice() {
+                const basePrice = 799;
+                const taxes = 100;
+                const serviceCharge = 50;
+                const total = basePrice + taxes + serviceCharge;
+                
+                document.querySelector('.booking-price').textContent = `$${total}`;
+                document.getElementById('pay-now-btn').textContent = `Pay Now $${total}`;
+            }
+            
+            // Ripple effect function
+            function createRippleEffect(event) {
+                const button = event.currentTarget;
+                const circle = document.createElement('span');
+                const diameter = Math.max(button.clientWidth, button.clientHeight);
+                const radius = diameter / 2;
+                
+                circle.style.width = circle.style.height = `${diameter}px`;
+                circle.style.left = `${event.clientX - button.getBoundingClientRect().left - radius}px`;
+                circle.style.top = `${event.clientY - button.getBoundingClientRect().top - radius}px`;
+                circle.classList.add('ripple');
+                
+                const ripple = button.getElementsByClassName('ripple')[0];
+                
+                if (ripple) {
+                    ripple.remove();
+                }
+                
+                button.appendChild(circle);
+            }
+            
+            // Add ripple effect to all buttons
+            document.querySelectorAll('.btn').forEach(button => {
+                button.addEventListener('click', createRippleEffect);
+            });
+            
+            // Password visibility toggle
+            document.querySelectorAll('.input-icon').forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const input = this.previousElementSibling;
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        this.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                    } else {
+                        input.type = 'password';
+                        this.innerHTML = '<i class="fas fa-eye"></i>';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
